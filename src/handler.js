@@ -3,7 +3,7 @@ import * as rooms from './rooms';
 export function handle(message, client) {
 	switch(message.event) {
 		case 'set_name':
-			setName(mesage.payload.name || '', client);
+			setName(message.payload.name || '', client);
 			break;
 		case 'create_room':
 			createRoom(message.payload.name || '', client);

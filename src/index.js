@@ -11,7 +11,6 @@ server.on('connection', (socket)=> {
 	let client = new Client(generToken(16), socket);
 	
 	client.onMessage((message, source)=> {
-		// TODO preprocess message & log
 		if (!message || !message.event || !message.payload) {
 			console.error('trying to send incorrect message from "' + source + '"');
 			return;
