@@ -65,7 +65,7 @@ function connect(id, client) {
 		throw new Error('id required');
 	}
 	
-	rooms.connect(id, client);
+	rooms.connect(id.toString(), client);
 }
 
 function leave(client) {

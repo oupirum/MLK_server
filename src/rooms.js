@@ -1,6 +1,5 @@
 import { Room } from './room';
 
-console.log('rooms.js imported');
 const rooms = {};
 let lastRoomId = 0;
 
@@ -19,6 +18,14 @@ export function create(name, client) {
 }
 
 export function connect(id, client) {
+	if (client.room) {
+		if (client.room.id !== id) {
+			leave(client);
+		} else {
+			return;
+		}
+	}
+	
 	let room = rooms[id];
 	if (!room) {
 		throw new Error('room with id "' + id + '" does not exist');
@@ -27,15 +34,22 @@ export function connect(id, client) {
 		throw new Error('could not connect because of limit of clients reached');
 	}
 	
-	if (client.room) {
-		leave(client);
-	}
+	Object.keys(room.clients).forEach((clientId)=> {
+		client.send({
+			event: 'client_connected',
+			payload: {
+				id: clientId,
+				name: room.clients[clientId].name
+			}
+		}, 'connect to room');
+	});
 	
 	room.clients[client.id] = client;
 	room.broadcast(client, {
 		event: 'client_connected',
 		payload: {
-			client_id: client.id
+			id: client.id,
+			name: client.name
 		}
 	}, 'connect to room');
 	
@@ -55,7 +69,7 @@ export function leave(client) {
 		room.broadcast(client, {
 			event: 'client_left',
 			payload: {
-				client_id: client.id
+				id: client.id
 			}
 		}, 'leave');
 	}
