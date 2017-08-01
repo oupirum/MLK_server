@@ -46,7 +46,7 @@ export function connect(id, client) {
 	room.clients[client.id] = client;
 	broadcastConnected(client, room);
 	
-	if (Object.keys(room.clients).length == 2) {
+	if (Object.keys(room.clients).length === 2) {
 		delayedPersist(room);
 	}
 }

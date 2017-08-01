@@ -27,7 +27,6 @@ export class Room {
 		Object.keys(this.clients).forEach((clientId)=> {
 			message.room_id = this.id;
 			message.sender_id = sender.id;
-			message.time = new Date().valueOf();
 			
 			let client = this.clients[clientId];
 			client.send(message, source);

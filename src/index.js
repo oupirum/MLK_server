@@ -21,9 +21,9 @@ function startServer() {
 	let server = net.createServer();
 	
 	server.on('connection', (socket)=> {
-		console.log('client connected');
 		socket = new JsonSocket(socket);
 		let client = new Client(generToken(16), socket);
+		console.log('client connected', client.id);
 		
 		client.onMessage((message, source)=> {
 			if (!message || !message.event || !message.payload) {
@@ -34,7 +34,7 @@ function startServer() {
 		});
 		
 		socket.on('message', (message)=> {
-			console.log('received from client:', message);
+			console.log(`received from client ${client.id}:`, message);
 			if (!message.event || !message.payload) {
 				socket.sendError('incorrect format, message must contain "event" and "payload" required fields');
 				return;
@@ -48,17 +48,17 @@ function startServer() {
 		});
 		
 		socket.on('end', ()=> {
-			console.log('client disconnected');
+			console.log('client disconnected', client.id);
 			try {
 				disconnect(client);
 			} catch(err) {
-				console.error('error on handling client disconnection');
+				console.error('error on handling client disconnection:', err);
 			}
 		});
 	});
 	
 	server.listen({ port: port }, ()=> {
-		console.log('listening...');
+		console.log(`listening on port ${port}...`);
 	});
 }
 
