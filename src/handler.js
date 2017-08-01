@@ -17,8 +17,8 @@ export function handle(message, client) {
 		case 'message':
 			sendChatMessage(message.payload.text || '', client);
 			break;
-		case 'game_event':
-			sendGameEvent(message.payload.data, client);
+		case 'event':
+			sendEvent(message.payload.data, client);
 			break;
 		default:
 			throw new Error('unknown event "' + message.event + '"');
@@ -49,7 +49,7 @@ function createRoom(name, client) {
 		throw new Error('room name must have length 3-80 characters');
 	}
 	
-	rooms.create(name, client);
+	rooms.createAndConnect(name, client);
 	
 	client.send({
 		event: 'room_created',
@@ -104,7 +104,7 @@ function sendGameEvent(data, client) {
 	}
 	
 	room.broadcast(client, {
-		event: 'game_event',
+		event: 'event',
 		payload: {
 			data: data
 		}
