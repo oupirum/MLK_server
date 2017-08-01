@@ -97,7 +97,7 @@ function sendChatMessage(text, client) {
 	}, 'send chat message');
 }
 
-function sendGameEvent(data, client) {
+function sendEvent(data, client) {
 	let room = client.room;
 	if (!room) {
 		throw new Error('not connected to any room');
