@@ -109,7 +109,7 @@ describe('handler;', ()=> {
 				expect(fs.existsSync(`${rooms.PERSIST_DIR}/room_1`)).toBe(true);
 				
 				done();
-			});
+			}, 5);
 		});
 	});
 	
@@ -164,8 +164,8 @@ describe('handler;', ()=> {
 					expect(fs.existsSync(`${rooms.PERSIST_DIR}/room_1`)).toBe(false);
 					
 					done();
-				});
-			});
+				}, 5);
+			}, 5);
 		});
 	});
 	

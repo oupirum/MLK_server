@@ -26,14 +26,26 @@ describe('client;', ()=> {
 				}));
 			}
 			
-			done();
-		}, 100);
+			setTimeout(done, 10);
+		}, 300);
 	});
 	
 	afterEach(()=> {
 		server.kill('SIGINT');
 	});
 	
+	
+	it('handle error;', (done)=> {
+		sendEvent(sockets[0], { test: 'qwe' });
+		
+		setTimeout(()=> {
+			expect(messages[0].length).toBe(1);
+			expect(messages[0][0].success).toBe(false);
+			expect(messages[0][0].error).toContain('not connected');
+			
+			done();
+		}, 30);
+	});
 	
 	it('create room;', (done)=> {
 		createRoom(sockets[0], 'room 1');
@@ -49,9 +61,7 @@ describe('client;', ()=> {
 	});
 	
 	it('connect several clients;', (done)=> {
-		createRoom(sockets[0], 'room 1');
-		connect(sockets[1], '1');
-		connect(sockets[2], '1');
+		createRoomAndConnectAll(1)
 		
 		setTimeout(()=> {
 			expect(messages[0].length).toBe(3);
@@ -87,9 +97,7 @@ describe('client;', ()=> {
 	});
 	
 	it('reconnect;', (done)=> {
-		createRoom(sockets[0], 'room 1');
-		connect(sockets[1], '1');
-		connect(sockets[2], '1');
+		createRoomAndConnectAll(1)
 		
 		setTimeout(()=> {
 			createRoom(sockets[1], 'room 2');
@@ -113,6 +121,73 @@ describe('client;', ()=> {
 			}, 30)
 		}, 30);
 	});
+	
+	it('disconnect;', (done)=> {
+		createRoomAndConnectAll(1)
+		
+		setTimeout(()=> {
+			sockets[1].end();
+			
+			setTimeout(()=> {
+				expect(messages[0].length).toBe(4);
+				expect(messages[0][3].event).toBe('client_left');
+				
+				expect(messages[1].length).toBe(3);
+				
+				expect(messages[2].length).toBe(4);
+				expect(messages[2][3].event).toBe('client_left');
+				
+				done();
+			}, 30)
+		}, 30);
+	});
+	
+	it('broadcast event;', (done)=> {
+		createRoomAndConnectAll(1)
+		
+		setTimeout(()=> {
+			sockets[1].end();
+			
+			setTimeout(()=> {
+				let data = { test: 'qwe' };
+				sendEvent(sockets[0], data);
+				
+				setTimeout(()=> {
+					expect(messages[0].length).toBe(5);
+					expect(messages[0][4].event).toBe('event');
+					expect(messages[0][4].payload.data).toEqual(data);
+					
+					expect(messages[1].length).toBe(3);
+					
+					expect(messages[2].length).toBe(5);
+					expect(messages[2][4].event).toBe('event');
+					expect(messages[2][4].payload.data).toEqual(data);
+					
+					done();
+				}, 30)
+			}, 30);
+		}, 30);
+	});
+	
+	
+	function sendEvent(socket, data) {
+		socket.sendMessage({
+			event: 'event',
+			payload: {
+				data, data
+			}
+		});
+	}
+	
+	function createRoomAndConnectAll(roomN) {
+		createRoom(sockets[0], 'room ' + roomN);
+		let delay = 0;
+		for (let i = 1; i < sockets.length; i++) {
+			setTimeout(()=> {
+				connect(sockets[i], roomN.toString());
+			}, delay += 3);
+		}
+	}
 	
 	function createRoom(socket, name) {
 		socket.sendMessage({

@@ -93,7 +93,7 @@ describe('restore rooms;', ()=> {
 		setTimeout(()=> {
 			rooms._resetRooms();
 			cb();
-		});
+		}, 5);
 	}
 	
 	function persistRoom(n) {
