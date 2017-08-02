@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel ./src -d ./bin --presets es2015 --source-maps",
-    "test": "nodemon -w ./src -w ./tests -x 'npm run build && babel ./tests -d ./tests_bin --presets es2015 --source-maps && jasmine --config=jasmine.json'",
+    "test": "nodemon -w ./src -w ./tests -x 'npm run build && babel ./tests -d ./tests_bin --presets es2015 --source-maps && jasmine --config=./jasmine.json'",
     "start": "npm run build && node ./bin/index.js",
     "testclient": "npm run build && node ./tests_bin/client.js"
   },
